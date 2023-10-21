@@ -2,7 +2,7 @@
 import numpy as np
 import datetime
 import os
-from src.test_utils import get_preprocessed_data
+from src.test_utils import get_preprocessed_data, visualize_loss
 
 
 class Param:
@@ -197,7 +197,7 @@ class TwoLayerNet:
         # Run stochastic gradient descent to optimize W
         loss_history = []
         for it in range(num_iters):
-            idxs = np.random.choice(num_classes, batch_size)
+            idxs = np.random.choice(len(X), batch_size)
             X_batch, y_batch = X[idxs], y[idxs]
             # evaluate loss and gradient
             self.forward(X_batch, y_batch)
@@ -241,16 +241,16 @@ def train():
 
     # ***** START OF YOUR CODE *****
     n_input, n_output, hidden = 3072, 10, 256
-    learning_rate = 2e-3
-    reg = 10
-    num_iters = 3000
-    batch_size = 1024
+    learning_rate = 1e-3
+    reg = 0.01
+    num_iters = 20000
+    batch_size = 64
     # ******* END OF YOUR CODE ************
 
     (x_train, y_train), (x_test, y_test) = get_preprocessed_data(include_bias=False)
-    cls = TwoLayerNet(n_input, n_output, hidden)
+    cls = TwoLayerNet(n_input, n_output, hidden, reg)
     t0 = datetime.datetime.now()
-    loss_history = cls.fit(x_train, y_train, learning_rate, reg, num_iters, batch_size)
+    loss_history = cls.fit(x_train, y_train, learning_rate, num_iters, batch_size)
     t1 = datetime.datetime.now()
     dt = t1 - t0
 
@@ -277,6 +277,7 @@ Test accuracy: {cls.evaluate(x_test, y_test)}
     report_path = os.path.join(out_dir, 'report.md')
     with open(report_path, 'w') as f:
         f.write(report)
+    visualize_loss(loss_history, out_dir)
 
 
 
